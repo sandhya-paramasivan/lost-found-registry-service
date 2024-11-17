@@ -1,1 +1,2 @@
-# lost-found-registry-service
+# lost-found-service
+Lost and found registry service
