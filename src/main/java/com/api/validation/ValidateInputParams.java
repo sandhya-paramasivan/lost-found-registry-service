@@ -1,5 +1,4 @@
-package com.example.validation;
-import jakarta.validation.Constraint;
+package com.api.validation;
 import jakarta.validation.Payload;
 
 import java.lang.annotation.ElementType;

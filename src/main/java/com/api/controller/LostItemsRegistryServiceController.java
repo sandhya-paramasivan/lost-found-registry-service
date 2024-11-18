@@ -1,13 +1,13 @@
-package com.example.controller;
+package com.api.controller;
 
-import com.example.model.LostItemsDetails;
-import com.example.service.LostItemsRegistryService;
-import com.example.validation.ValidateInputFile;
-import com.example.validation.ValidateInputParams;
+import com.api.model.LostItemsDetails;
+import com.api.service.LostItemsRegistryService;
+import com.api.validation.ValidateInputFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,7 +22,7 @@ public class LostItemsRegistryServiceController {
     }
 
     @PostMapping("/uploadData")
-    public String updateLostItemsRegistry(@ValidateInputFile @RequestParam("lostItemsFile") MultipartFile lostItemsFile) {
+    public String updateLostItemsRegistry(@ValidateInputFile @RequestParam("lostItemsFile") MultipartFile lostItemsFile) throws IOException {
         return lostItemsRegistryService.processLostItemsDetails(lostItemsFile);
     }
 
@@ -36,6 +36,12 @@ public class LostItemsRegistryServiceController {
     public List<LostItemsDetails> claimLostItems(@RequestParam("itemName") String itemName,@RequestParam("place") String place,
                                  @RequestParam("userId") String userId, @RequestParam("claimQuantity") Integer claimQuantity) {
         return lostItemsRegistryService.claimLostItems(itemName,place,userId,claimQuantity);
+    }
+
+    @GetMapping("/retrieveClaimedItemsDetails")
+    public List<LostItemsDetails> retrieveClaimedItemsDetails(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        return lostItemsRegistryService.retrieveClaimedItemsDetails(page,size);
     }
 
 }

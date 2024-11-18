@@ -1,4 +1,4 @@
-package com.example.enums;
+package com.api.enums;
 
 
 import lombok.Getter;

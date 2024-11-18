@@ -1,6 +1,6 @@
-package com.example.model;
+package com.api.model;
 
-import com.example.enums.StatusEnum;
+import com.api.enums.StatusEnum;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

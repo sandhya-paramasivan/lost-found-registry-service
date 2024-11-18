@@ -1,4 +1,4 @@
-package com.example.validation;
+package com.api.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -8,9 +8,6 @@ public class CustomValidator implements ConstraintValidator<ValidateInputFile, M
 
     @Override
     public boolean isValid(MultipartFile lostItemsFile, ConstraintValidatorContext constraintValidatorContext) {
-        if(!lostItemsFile.getOriginalFilename().endsWith(".csv")){
-            return false;
-        }
-        return true;
+        return lostItemsFile.getOriginalFilename().endsWith(".csv");
     }
 }
