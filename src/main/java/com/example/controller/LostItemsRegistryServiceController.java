@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.model.LostItemsDetails;
 import com.example.service.LostItemsRegistryService;
+import com.example.validation.ValidateInputFile;
 import com.example.validation.ValidateInputParams;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class LostItemsRegistryServiceController {
     }
 
     @PostMapping("/uploadData")
-    public String updateLostItemsRegistry(@ValidateInputParams @RequestParam("lostItemsFile") MultipartFile lostItemsFile) {
+    public String updateLostItemsRegistry(@ValidateInputFile @RequestParam("lostItemsFile") MultipartFile lostItemsFile) {
         return lostItemsRegistryService.processLostItemsDetails(lostItemsFile);
     }
 
