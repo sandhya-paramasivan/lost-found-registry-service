@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum StatusEnum {
-    NEW,
+    LOST,
     TO_BE_CLAIMED,
     CLAIMED
 }

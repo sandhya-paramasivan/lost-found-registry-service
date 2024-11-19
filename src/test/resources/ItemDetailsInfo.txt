@@ -1,0 +1,5 @@
+﻿ItemName;Quantity;Place
+Laptop;1;Taxi
+Headphones;2;Railway Station
+Jewellery;4;Airport
+Laptop;1;Airport

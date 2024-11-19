@@ -8,6 +8,7 @@ import org.apache.commons.csv.CSVParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,30 +52,39 @@ public class LostItemsRegistryService implements ILostItemsRegistryService {
             String[] value = record.get(0).split(";");
             LostItemsDetails lostItemsDetails= LostItemsDetails.builder().itemName(value[0])
                     .quantity(Integer.parseInt(value[1]))
-                    .place(value[2]).status(StatusEnum.NEW).build();
+                    .place(value[2]).status(StatusEnum.LOST).build();
             lostItems.add(lostItemsDetails);
             });
         return lostItems;
     }
 
     @Override
-    public List<LostItemsDetails> retrieveLostItemsDetails(int page, int size) {
+    public ResponseEntity<List<LostItemsDetails>> retrieveLostItemsDetails(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return lostItemsRegistryRepository.findAll(pageable).getContent();
+        List<LostItemsDetails> lostitems = lostItemsRegistryRepository.findAll(pageable).getContent();
+        if (lostitems.isEmpty()) {
+            return ResponseEntity.notFound().build();  // Return 404 Not Found if list is empty
+        }
+
+        return ResponseEntity.ok(lostitems);
     }
 
     @Override
-    public List<LostItemsDetails> claimLostItems(String itemName, String place, String userId, Integer claimQuantity) {
+    public ResponseEntity<List<LostItemsDetails>>claimLostItems(String itemName, String place, String userId, Integer claimQuantity) {
         List<LostItemsDetails> lostItems =  lostItemsRegistryRepository.findByItemNameAndPlace(itemName,place);
         List<LostItemsDetails> toClaimLostItems = lostItems.stream().filter(lostItemsDetails-> !lostItemsDetails.getStatus().equals(StatusEnum.CLAIMED)).collect(Collectors.toList());
         updateUserDetails(toClaimLostItems,userId,claimQuantity);
-        return toClaimLostItems;
+        return ResponseEntity.ok(toClaimLostItems);
     }
 
     @Override
-    public List<LostItemsDetails> retrieveClaimedItemsDetails(int page, int size) {
+    public ResponseEntity<List<LostItemsDetails>> retrieveClaimedItemsDetails(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return lostItemsRegistryRepository.findByStatus(StatusEnum.CLAIMED,pageable);
+        List<LostItemsDetails> lostitems =lostItemsRegistryRepository.findByStatus(StatusEnum.CLAIMED,pageable);
+        if (lostitems.isEmpty()) {
+            return ResponseEntity.notFound().build();  // Return 404 Not Found if list is empty
+        }
+        return ResponseEntity.ok(lostitems);
     }
 
     private void updateUserDetails(List<LostItemsDetails> toClaimLostItems, String userId, Integer claimQuantity) {
