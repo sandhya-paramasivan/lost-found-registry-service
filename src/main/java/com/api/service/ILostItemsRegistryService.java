@@ -1,6 +1,7 @@
 package com.api.service;
 
 import com.api.model.LostItemsDetails;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +14,7 @@ public interface ILostItemsRegistryService {
 
      ResponseEntity<List<LostItemsDetails>> claimLostItems(String itemName, String place, String userId, Integer claimQuantity);
 
-     ResponseEntity<List<LostItemsDetails>> retrieveLostItemsDetails(int page, int size);
+     ResponseEntity<List<LostItemsDetails>> retrieveLostItemsDetails(Pageable pageable);
 
      ResponseEntity<List<LostItemsDetails>> retrieveClaimedItemsDetails(int page, int size);
 }

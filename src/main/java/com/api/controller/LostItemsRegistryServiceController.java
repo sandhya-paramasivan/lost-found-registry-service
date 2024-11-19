@@ -4,6 +4,8 @@ import com.api.model.LostItemsDetails;
 import com.api.service.LostItemsRegistryService;
 import com.api.validation.ValidateInputFile;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +32,8 @@ public class LostItemsRegistryServiceController {
     @GetMapping("/retrieveLostItemsDetails")
     public ResponseEntity<List<LostItemsDetails>> retrieveLostItemsDetails(@RequestParam(defaultValue = "0") int page,
                                                                            @RequestParam(defaultValue = "10") int size) {
-        return lostItemsRegistryService.retrieveLostItemsDetails(page,size);
+        Pageable pageable = PageRequest.of(page, size);
+        return lostItemsRegistryService.retrieveLostItemsDetails(pageable);
     }
 
     @PostMapping("/claimItems")

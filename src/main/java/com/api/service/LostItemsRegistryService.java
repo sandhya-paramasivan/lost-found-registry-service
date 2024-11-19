@@ -46,7 +46,7 @@ public class LostItemsRegistryService implements ILostItemsRegistryService {
         return "Data processed successfully";
     }
 
-    private List<LostItemsDetails> constructLostItemEntity(CSVParser csvParser) {
+    List<LostItemsDetails> constructLostItemEntity(CSVParser csvParser) {
         List<LostItemsDetails> lostItems = new ArrayList<>();
         csvParser.stream().forEach(record -> {
             String[] value = record.get(0).split(";");
@@ -59,9 +59,8 @@ public class LostItemsRegistryService implements ILostItemsRegistryService {
     }
 
     @Override
-    public ResponseEntity<List<LostItemsDetails>> retrieveLostItemsDetails(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<LostItemsDetails> lostitems = lostItemsRegistryRepository.findAll(pageable).getContent();
+    public ResponseEntity<List<LostItemsDetails>> retrieveLostItemsDetails(Pageable pageable) {
+        List<LostItemsDetails> lostitems = lostItemsRegistryRepository.findByStatus(StatusEnum.LOST,pageable);
         if (lostitems.isEmpty()) {
             return ResponseEntity.notFound().build();  // Return 404 Not Found if list is empty
         }

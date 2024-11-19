@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface LostItemsRegistryRepository extends MongoRepository<LostItemsDetails,String> {
 
+
+
     List<LostItemsDetails> findByItemNameAndPlace(String itemName, String place);
 
     List<LostItemsDetails> findByStatus(StatusEnum statusEnum , Pageable pageable);
