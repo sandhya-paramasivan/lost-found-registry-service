@@ -22,6 +22,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import com.api.repository.LostItemsRegistryRepository;
@@ -58,17 +61,35 @@ public class LostItemsRegistryService implements ILostItemsRegistryService {
     }
 
     List<LostItemsDetails> constructLostItemEntity(CSVParser csvParser) {
-        List<LostItemsDetails> lostItems = new ArrayList<>();
-        csvParser.stream().forEach(record -> {
-            String[] value = record.get(0).split(";");
-            LostItemsDetails lostItemsDetails= LostItemsDetails.builder().itemName(value[0])
-                    .quantity(Integer.parseInt(value[1]))
-                    .place(value[2]).status(StatusEnum.LOST).build();
-            lostItems.add(lostItemsDetails);
-            });
-        return lostItems;
-    }
+        /* Create an ExecutorService for managing virtual threads*/
+        ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+        try {
+            /*Process CSV records in parallel using virtual threads*/
+            List<Future<LostItemsDetails>> futures = csvParser.stream()
+                    .map(record -> executorService.submit(() -> {
+                        String[] value = record.get(0).split(";");
+                        return LostItemsDetails.builder()
+                                .itemName(value[0])
+                                .quantity(Integer.parseInt(value[1]))
+                                .place(value[2])
+                                .status(StatusEnum.LOST)
+                                .build();
+                    }))
+                    .collect(Collectors.toList());
 
+            // Collect results from futures
+            List<LostItemsDetails> lostItems = new ArrayList<>();
+            for (Future<LostItemsDetails> future : futures) {
+                lostItems.add(future.get());
+            }
+
+            return lostItems;
+        } catch (Exception e) {
+            throw new InternalServerException("Error during CSV processing");
+        } finally {
+            executorService.shutdown();
+        }
+    }
 /*
     Following method retrievelostitems with status LOST
 */
