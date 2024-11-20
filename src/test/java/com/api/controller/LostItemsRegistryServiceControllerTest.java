@@ -4,8 +4,10 @@ package com.api.controller;
 import com.api.enums.StatusEnum;
 import com.api.model.LostItemsDetails;
 import com.api.service.LostItemsRegistryService;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
@@ -25,9 +27,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.test.context.support.WithMockUser;
 
 @AutoConfigureDataMongo
 @WebMvcTest(controllers = LostItemsRegistryServiceController.class)
+@AutoConfigureMockMvc(addFilters = false) // Disable security filters in tests
 class LostItemsRegistryServiceControllerTest {
 
     @MockBean
@@ -36,6 +40,9 @@ class LostItemsRegistryServiceControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+
+    @Test
+    @WithMockUser(username = "sandhya", roles = "ADMIN" , password = "sandhya")
     void givenValidFile_thenReturn200x() throws Exception {
 
         MockMultipartFile lostItemsFile = new MockMultipartFile("lostItemsFile",
@@ -45,13 +52,16 @@ class LostItemsRegistryServiceControllerTest {
 
         when(lostItemsRegistryService.processLostItemsDetails(lostItemsFile)).thenReturn(ResponseEntity.ok("Data processed successfully"));
 
-        mockMvc.perform(multipart ("/lostItemsRegistryService/v1/uploadData")
+
+        mockMvc.perform(multipart ("/lostItemsRegistryService/v1/admin/uploadData")
                         .file(lostItemsFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .headers(VALID_HEADER_FILE))
                         .andExpect(status().isOk());
     }
 
+    @Test
+    @WithMockUser(username = "sandhya", roles = "ADMIN" , password = "sandhya")
     void givenInValidFile_thenReturn400x() throws Exception {
 
         MockMultipartFile lostItemsFile = new MockMultipartFile("lostItemsFile",
@@ -59,17 +69,19 @@ class LostItemsRegistryServiceControllerTest {
                 "text/plain",
                 "This is a test file content".getBytes());
 
-        mockMvc.perform(multipart ("/lostItemsRegistryService/v1/uploadData")
+        mockMvc.perform(multipart ("/lostItemsRegistryService/v1/admin/uploadData")
                         .file(lostItemsFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .headers(VALID_HEADER_FILE))
                 .andExpect(status().is4xxClientError());
     }
 
+    @Test
+    @WithMockUser(username = "sandhya", roles = "USER" , password = "sandhya")
     void getLostItems_DataAvailable_thenReturn200x() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
         when(lostItemsRegistryService.retrieveLostItemsDetails(pageable)).thenReturn(ResponseEntity.ok(constructMockLostItemDetails()));
-        mockMvc.perform(get("/lostItemsRegistryService/v1/retrieveLostItemsDetails"))
+        mockMvc.perform(get("/lostItemsRegistryService/v1/user/retrieveLostItemsDetails"))
                 .andExpect(status().isOk())  // Assert the response status is 200 OK
                 .andExpect(jsonPath("$[0].itemName").value("Laptop"))
                 .andExpect(jsonPath("$[0].quantity").value(1))
@@ -78,18 +90,20 @@ class LostItemsRegistryServiceControllerTest {
 
     }
 
+
+    @Test
     void getLostItems_DataUnAvailable_thenReturn400x() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
         when(lostItemsRegistryService.retrieveLostItemsDetails(pageable)).thenReturn(ResponseEntity.notFound().build());
-        mockMvc.perform(get("/lostItemsRegistryService/v1/retrieveLostItemsDetails"))
+        mockMvc.perform(get("/lostItemsRegistryService/v1/user/retrieveLostItemsDetails"))
                 .andExpect(status().is4xxClientError());
 
     }
 
+    @Test
     void getClaimedLostItems_DataAvailable_thenReturn200x() throws Exception {
-
         when(lostItemsRegistryService.retrieveClaimedItemsDetails(0,10)).thenReturn(ResponseEntity.ok(constructMockClaimedItemDetails()));
-        mockMvc.perform(get("/lostItemsRegistryService/v1/retrieveClaimedItemsDetails"))
+        mockMvc.perform(get("/lostItemsRegistryService/v1/admin/retrieveClaimedItemsDetails"))
                 .andExpect(status().isOk())  // Assert the response status is 200 OK
                 .andExpect(jsonPath("$[0].itemName").value("Laptop"))
                 .andExpect(jsonPath("$[0].quantity").value(1))
@@ -98,10 +112,11 @@ class LostItemsRegistryServiceControllerTest {
 
     }
 
-    void getClaimedLostItems_DataUnAvailable_thenReturn400x() throws Exception {
 
+    @Test
+    void getClaimedLostItems_DataUnAvailable_thenReturn400x() throws Exception {
         when(lostItemsRegistryService.retrieveClaimedItemsDetails(0,10)).thenReturn(ResponseEntity.notFound().build());
-        mockMvc.perform(get("/lostItemsRegistryService/v1/retrieveClaimedItemsDetails"))
+        mockMvc.perform(get("/lostItemsRegistryService/v1/admin/retrieveClaimedItemsDetails"))
                 .andExpect(status().is4xxClientError());
 
     }

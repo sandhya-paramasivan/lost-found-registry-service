@@ -28,13 +28,13 @@ public class LostItemsRegistryServiceController {
     }
 
     @PostMapping("/admin/uploadData")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     private ResponseEntity<String> updateLostItemsRegistry(@ValidateInputFile @RequestParam("lostItemsFile") MultipartFile lostItemsFile) throws IOException {
         return lostItemsRegistryService.processLostItemsDetails(lostItemsFile);
     }
 
     @GetMapping("/user/retrieveLostItemsDetails")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<LostItemsDetails>> retrieveLostItemsDetails(@RequestParam(defaultValue = "0") int page,
                                                                            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -42,14 +42,14 @@ public class LostItemsRegistryServiceController {
     }
 
     @PostMapping("/user/claimItems")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<LostItemsDetails>> claimLostItems(@RequestParam("itemName") String itemName,@RequestParam("place") String place,
                                  @RequestParam("userId") String userId, @RequestParam("claimQuantity") Integer claimQuantity) throws BadRequestException {
         return lostItemsRegistryService.claimLostItems(itemName,place,userId,claimQuantity);
     }
 
     @GetMapping("/admin/retrieveClaimedItemsDetails")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<LostItemsDetails>> retrieveClaimedItemsDetails(@RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size) {
         return lostItemsRegistryService.retrieveClaimedItemsDetails(page,size);
