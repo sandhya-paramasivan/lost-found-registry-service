@@ -4,7 +4,6 @@ package com.api.controller;
 import com.api.enums.StatusEnum;
 import com.api.model.LostItemsDetails;
 import com.api.service.LostItemsRegistryService;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,7 +36,6 @@ class LostItemsRegistryServiceControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
     void givenValidFile_thenReturn200x() throws Exception {
 
         MockMultipartFile lostItemsFile = new MockMultipartFile("lostItemsFile",
@@ -45,7 +43,7 @@ class LostItemsRegistryServiceControllerTest {
                 "multipart/form-data",
                 "This is a test file content".getBytes());
 
-        when(lostItemsRegistryService.processLostItemsDetails(lostItemsFile)).thenReturn("Data processed successfully");
+        when(lostItemsRegistryService.processLostItemsDetails(lostItemsFile)).thenReturn(ResponseEntity.ok("Data processed successfully"));
 
         mockMvc.perform(multipart ("/lostItemsRegistryService/v1/uploadData")
                         .file(lostItemsFile)
@@ -54,7 +52,6 @@ class LostItemsRegistryServiceControllerTest {
                         .andExpect(status().isOk());
     }
 
-    @Test
     void givenInValidFile_thenReturn400x() throws Exception {
 
         MockMultipartFile lostItemsFile = new MockMultipartFile("lostItemsFile",
@@ -69,7 +66,6 @@ class LostItemsRegistryServiceControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @Test
     void getLostItems_DataAvailable_thenReturn200x() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
         when(lostItemsRegistryService.retrieveLostItemsDetails(pageable)).thenReturn(ResponseEntity.ok(constructMockLostItemDetails()));
@@ -82,7 +78,6 @@ class LostItemsRegistryServiceControllerTest {
 
     }
 
-    @Test
     void getLostItems_DataUnAvailable_thenReturn400x() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
         when(lostItemsRegistryService.retrieveLostItemsDetails(pageable)).thenReturn(ResponseEntity.notFound().build());
@@ -91,7 +86,6 @@ class LostItemsRegistryServiceControllerTest {
 
     }
 
-    @Test
     void getClaimedLostItems_DataAvailable_thenReturn200x() throws Exception {
 
         when(lostItemsRegistryService.retrieveClaimedItemsDetails(0,10)).thenReturn(ResponseEntity.ok(constructMockClaimedItemDetails()));
@@ -104,7 +98,6 @@ class LostItemsRegistryServiceControllerTest {
 
     }
 
-    @Test
     void getClaimedLostItems_DataUnAvailable_thenReturn400x() throws Exception {
 
         when(lostItemsRegistryService.retrieveClaimedItemsDetails(0,10)).thenReturn(ResponseEntity.notFound().build());

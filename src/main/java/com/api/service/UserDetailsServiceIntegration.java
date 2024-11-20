@@ -7,13 +7,13 @@ import com.api.repository.UserDetailsRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDetailsService
+public class UserDetailsServiceIntegration
 {
 
     private final UserDetailsServiceClient userDetailsServiceClient;
     private final UserDetailsRepository userDetailsRepository;
 
-    public UserDetailsService(UserDetailsServiceClient userDetailsServiceClient, UserDetailsRepository userDetailsRepository) {
+    public UserDetailsServiceIntegration(UserDetailsServiceClient userDetailsServiceClient, UserDetailsRepository userDetailsRepository) {
         this.userDetailsServiceClient = userDetailsServiceClient;
         this.userDetailsRepository = userDetailsRepository;
     }

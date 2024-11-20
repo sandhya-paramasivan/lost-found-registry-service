@@ -1,4 +1,0 @@
-#Multipart data with boundary
-
-Request plays a crucial role in separating different parts of the form data in HTTP requests
-The boundary acts as a separator between these parts. It’s a unique string that appears between each part in the request body to tell the server where one part ends and the next part begins.
